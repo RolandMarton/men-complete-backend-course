@@ -8,7 +8,7 @@ const arcjetMiddleware = async (req, res, next) => {
 			if (decision.reason.isRateLimit()) return res.status(429).json({ error: 'Rate limit exceeded' });
 			if (decision.reason.isBot()) return res.status(403).json({ error: 'Bot detected' });
 
-			return res.status(403).json({ error: 'Request denied by Arcjet Shield' });
+			return res.status(403).json({ error: 'Access denied' });
 		}
 
 		next();
