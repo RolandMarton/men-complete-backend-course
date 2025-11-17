@@ -11,7 +11,7 @@ const subscriptionSchema = new mongoose.Schema(
 		},
 		price: {
 			type: Number,
-			required: [true, 'Price is required'],
+			required: [true, 'Subscription price is required'],
 			min: [0, 'Price must be greater than 0'],
 		},
 		currency: {
@@ -35,7 +35,7 @@ const subscriptionSchema = new mongoose.Schema(
 		},
 		status: {
 			type: String,
-			enum: ['active', 'inactive', 'canceled'],
+			enum: ['active', 'cancelled', 'expired'],
 			default: 'active',
 		},
 		startDate: {
@@ -48,7 +48,6 @@ const subscriptionSchema = new mongoose.Schema(
 		},
 		renewalDate: {
 			type: Date,
-			required: true,
 			validate: {
 				validator: function (value) {
 					return value > this.startDate;
@@ -63,12 +62,10 @@ const subscriptionSchema = new mongoose.Schema(
 			index: true,
 		},
 	},
-	{
-		timestamps: true,
-	}
+	{ timestamps: true }
 );
 
-// Auto-calculate renewalDate before saving
+// Auto-calculate renewal date if missing.
 subscriptionSchema.pre('save', function (next) {
 	if (!this.renewalDate) {
 		const renewalPeriods = {
@@ -87,7 +84,7 @@ subscriptionSchema.pre('save', function (next) {
 		this.status = 'expired';
 	}
 
-  next();
+	next();
 });
 
 const Subscription = mongoose.model('Subscription', subscriptionSchema);
